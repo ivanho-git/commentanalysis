@@ -1,4 +1,4 @@
-comment,sentiment,score,ProblemSummary
+comment,sentiment,score,ProblemSummary,userid
 this is a very sad way to show a,negative,0.8390337303328447,
 the apple is very nice i need to understand how it works though,positive,0.9337213592847532,
 "
