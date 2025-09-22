@@ -1,0 +1,14 @@
+streamlit
+scikit-learn
+pandas
+numpy
+matplotlib
+seaborn
+networkx
+plotly
+wordcloud
+langdetect
+deep-translator
+transformers
+sentence-transformers
+spacy
