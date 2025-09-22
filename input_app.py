@@ -6,7 +6,7 @@ import requests
 import base64
 import json
 from datetime import datetime
-import io  # Already added
+import io  # Add this import
 
 # ---------------------------
 # Load trained model + vectorizer
@@ -37,7 +37,7 @@ def get_csv():
     if res.status_code == 200:
         content = res.json()
         csv_bytes = base64.b64decode(content["content"])
-        df = pd.read_csv(io.StringIO(csv_bytes.decode()))  # As previously fixed
+        df = pd.read_csv(io.StringIO(csv_bytes.decode()))  # Change this line
         return df, content["sha"]
     else:
         return pd.DataFrame(columns=["comment", "sentiment", "score", "ProblemSummary"]), None
@@ -93,33 +93,12 @@ if st.button("Submit") and user_comment.strip() != "":
     score = max(model.predict_proba(vec)[0])
 
     # ---------------------------
-    # Improved Aspect-Based Problem Summary for negative comments
+    # Simple Problem Summary for negative comments
     # ---------------------------
-    def summarize_problem(text, sentiment_label, max_aspects=3, max_words_per_aspect=5):
+    def summarize_problem(text, sentiment_label, max_words=12):
         if sentiment_label.lower() == "negative":
-            # Define common negative adjectives
-            negative_adjectives = ['bad', 'poor', 'terrible', 'worst', 'awful', 'horrible']
-            
-            # Use regex to find patterns: <negative_adjective> followed by words (potential nouns/aspects)
-            aspects = []
-            for adj in negative_adjectives:
-                pattern = re.compile(rf"\b{adj}\s+([\w\s]+?)(?=\s+\w+|$)", re.IGNORECASE)  # Matches adjective + following words
-                matches = pattern.findall(text.lower())
-                for match in matches:
-                    # Clean and limit each aspect to max_words_per_aspect
-                    aspect_words = match.split()[:max_words_per_aspect]
-                    if aspect_words:  # Only add if there's content
-                        aspects.append(" ".join(aspect_words))
-            
-            if aspects:
-                # Create a summary from the extracted aspects
-                unique_aspects = list(set(aspects))  # Remove duplicates
-                summary = "Key problems: " + "; ".join(unique_aspects[:max_aspects]) + "..."  # Limit to max_aspects
-                return summary
-            else:
-                # Fallback: Shorten the original text if no aspects found
-                words = text.split()
-                return " ".join(words[:10]) + "..."  # First 10 words as fallback
+            words = text.split()
+            return " ".join(words[:max_words]) + ("..." if len(words) > max_words else "")
         return ""
 
     problem_summary = summarize_problem(user_comment, sentiment)
