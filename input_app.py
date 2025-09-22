@@ -6,6 +6,7 @@ import requests
 import base64
 import json
 from datetime import datetime
+import io  # Add this import
 
 # ---------------------------
 # Load trained model + vectorizer
@@ -36,7 +37,7 @@ def get_csv():
     if res.status_code == 200:
         content = res.json()
         csv_bytes = base64.b64decode(content["content"])
-        df = pd.read_csv(pd.compat.StringIO(csv_bytes.decode()))
+        df = pd.read_csv(io.StringIO(csv_bytes.decode()))  # Change this line
         return df, content["sha"]
     else:
         return pd.DataFrame(columns=["comment", "sentiment", "score", "ProblemSummary"]), None
@@ -122,4 +123,3 @@ if st.button("Submit") and user_comment.strip() != "":
     st.info(f"Sentiment: {sentiment} ({score:.2f})")
     if problem_summary:
         st.info(f"Key Problem Summary: {problem_summary}")
-
