@@ -6,70 +6,23 @@ import requests
 import base64
 import json
 from datetime import datetime
-import io
+import io  # Add this import
 
-# Custom CSS for enhanced styling
-st.set_page_config(
-    page_title="Comment Submission",
-    page_icon="💬",
-    layout="wide"
-)
-
-# Custom Styling
-st.markdown("""
-<style>
-    /* Global Styling */
-    .stApp {
-        background-color: #f0f4f8;
-        font-family: 'Inter', sans-serif;
-    }
-    
-    /* Input Container */
-    .input-container {
-        background-color: white;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        padding: 20px;
-        margin-bottom: 20px;
-    }
-    
-    /* Sentiment Chips */
-    .sentiment-chip {
-        display: inline-block;
-        padding: 5px 10px;
-        border-radius: 20px;
-        font-weight: bold;
-        margin-right: 10px;
-    }
-    
-    .positive-chip {
-        background-color: #e6f3ea;
-        color: #188038;
-    }
-    
-    .negative-chip {
-        background-color: #fce8e6;
-        color: #d93025;
-    }
-    
-    .neutral-chip {
-        background-color: #f1f3f4;
-        color: #5f6368;
-    }
-</style>
-""", unsafe_allow_html=True)
-
+# ---------------------------
 # Load trained model + vectorizer
+# ---------------------------
 with open("sentiment_model.pkl", "rb") as f:
     model = pickle.load(f)
 
 with open("vectorizer.pkl", "rb") as f:
     vectorizer = pickle.load(f)
 
+# ---------------------------
 # GitHub API setup
-TOKEN = st.secrets["GITHUB_TOKEN"]
-REPO = st.secrets["GITHUB_REPO"]
-CSV_PATH = st.secrets["CSV_PATH"]
+# ---------------------------
+TOKEN = st.secrets["GITHUB_TOKEN"]       # Add your token in Streamlit Secrets
+REPO = st.secrets["GITHUB_REPO"]         # e.g., "username/repo"
+CSV_PATH = st.secrets["CSV_PATH"]        # e.g., "comments.csv"
 
 HEADERS = {
     "Authorization": f"token {TOKEN}",
@@ -84,12 +37,12 @@ def get_csv():
     if res.status_code == 200:
         content = res.json()
         csv_bytes = base64.b64decode(content["content"])
-        df = pd.read_csv(io.StringIO(csv_bytes.decode()))
-        if "user_id" not in df.columns:
-            df["user_id"] = "Unknown"
+        df = pd.read_csv(io.StringIO(csv_bytes.decode()))  # As previously fixed
+        if "user_id" not in df.columns:  # Add user_id column if it doesn't exist
+            df["user_id"] = "Unknown"  # Default value for existing rows
         return df, content["sha"]
     else:
-        return pd.DataFrame(columns=["comment", "sentiment", "score", "ProblemSummary", "user_id"]), None
+        return pd.DataFrame(columns=["comment", "sentiment", "score", "ProblemSummary", "user_id"]), None  # Include user_id in empty DataFrame
 
 def update_csv(df, sha):
     """Push updated CSV back to GitHub"""
@@ -106,44 +59,25 @@ def update_csv(df, sha):
     else:
         st.error(f"Failed to update CSV: {res.text}")
 
-# Main App Layout
-st.title("💬 Comment Submission Portal")
+# ---------------------------
+# Streamlit page
+# ---------------------------
+st.title("💬 Comment Input Page (GitHub CSV)")
 
-# Main Input Container
-st.markdown('<div class="input-container">', unsafe_allow_html=True)
+df, sha = get_csv()
 
-# User Input Columns
-col1, col2 = st.columns([2, 1])
+# ---------------------------
+# User input
+# ---------------------------
+user_id = st.text_input("Enter your User ID (e.g., username):", value="Unknown")  # Default to "Unknown"
 
-with col1:
-    user_id = st.text_input(
-        "Enter your User ID", 
-        placeholder="username or email",
-        help="This helps us track and categorize comments"
-    )
+user_comment = st.text_area("Enter your comment:")
 
-with col2:
-    # Optional: Add a profile picture upload or avatar selection
-    st.write("👤 Profile")
+if st.button("Submit") and user_comment.strip() != "":
 
-# Comment Input
-user_comment = st.text_area(
-    "Share your thoughts", 
-    placeholder="Type your comment here...",
-    height=200
-)
-
-# Submit Button
-submit_col1, submit_col2 = st.columns([3, 1])
-
-with submit_col2:
-    submit_button = st.button("Submit Comment", use_container_width=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
-
-# Submission Logic
-if submit_button and user_comment.strip() != "":
-    # Text Cleaning Function
+    # ---------------------------
+    # Clean text
+    # ---------------------------
     def clean_text(text):
         text = str(text).lower()
         text = re.sub(r"http\S+|www\S+", "", text)
@@ -153,13 +87,18 @@ if submit_button and user_comment.strip() != "":
         text = re.sub(r"\s+", " ", text).strip()
         return text
 
-    # Sentiment Analysis
     cleaned = clean_text(user_comment)
+
+    # ---------------------------
+    # Vectorize + Predict
+    # ---------------------------
     vec = vectorizer.transform([cleaned])
     sentiment = model.predict(vec)[0]
     score = max(model.predict_proba(vec)[0])
 
-    # Problem Summary
+    # ---------------------------
+    # Simple Problem Summary for negative comments
+    # ---------------------------
     def summarize_problem(text, sentiment_label, max_words=12):
         if sentiment_label.lower() == "negative":
             words = text.split()
@@ -168,44 +107,24 @@ if submit_button and user_comment.strip() != "":
 
     problem_summary = summarize_problem(user_comment, sentiment)
 
-    # Prepare New Row
+    # ---------------------------
+    # Save to GitHub CSV
+    # ---------------------------
     new_row = {
-        "user_id": user_id or "Anonymous",
+        "user_id": user_id,  # Add user_id to the new row
         "comment": user_comment,
         "sentiment": sentiment,
         "score": score,
         "ProblemSummary": problem_summary
     }
-
-    # Fetch current DataFrame
-    df, sha = get_csv()
-
-    # Update DataFrame
     df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
 
-    # Sentiment Visualization
-    sentiment_color = (
-        "green" if sentiment.lower() == 'positive' 
-        else "red" if sentiment.lower() == 'negative' 
-        else "gray"
-    )
-
-    # Result Display
-    st.markdown(f"""
-    <div class="sentiment-chip {sentiment_color}-chip">
-        Sentiment: {sentiment} (Confidence: {score:.2f})
-    </div>
-    """, unsafe_allow_html=True)
-
-    if problem_summary:
-        st.info(f"Key Problem Summary: {problem_summary}")
-
-    # Update GitHub CSV
     if sha:
         update_csv(df, sha)
     else:
         st.error("Could not fetch CSV SHA from GitHub.")
 
-# Footer
-st.markdown("---")
-st.markdown("<div style='text-align: center; color: gray;'>Powered by AI-Driven Sentiment Analysis</div>", unsafe_allow_html=True)
+    # Display result
+    st.info(f"Sentiment: {sentiment} ({score:.2f})")
+    if problem_summary:
+        st.info(f"Key Problem Summary: {problem_summary}")
