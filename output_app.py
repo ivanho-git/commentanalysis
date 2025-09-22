@@ -11,7 +11,8 @@ text_color = "#FFFFFF"
 comment_bg = "#1E1E1E"
 author_color = "#AAAAAA"
 timestamp_color = "#777777"
-like_color = "#F00"  # Red for likes
+considered_color = "#4CAF50"  # Green
+disapproved_color = "#F44336"  # Red
 
 # Apply global styling
 st.markdown(f"""
@@ -91,8 +92,17 @@ if not df.empty:
                 if "ProblemSummary" in df.columns and not pd.isna(row["ProblemSummary"]) and row["ProblemSummary"]:
                     st.write(f"**Problem Summary:** {row['ProblemSummary']}")
 
-                # Add a like button (placeholder)
-                st.button("👍 Like", key=f"like_{idx}", disabled=True)  # Placeholder - Streamlit doesn't have native like buttons
+                # Add considered/disapproved buttons (placeholder)
+                considered_key = f"considered_{idx}"
+                disapproved_key = f"disapproved_{idx}"
+
+                if considered_key not in st.session_state:
+                    st.session_state[considered_key] = False
+                if disapproved_key not in st.session_state:
+                    st.session_state[disapproved_key] = False
+
+                considered_button = st.button("✅ Considered", key=considered_key, on_click=lambda: st.session_state.update({considered_key: True}), disabled=st.session_state[disapproved_key])
+                disapproved_button = st.button("❌ Disapproved", key=disapproved_key, on_click=lambda: st.session_state.update({disapproved_key: True}), disabled=st.session_state[considered_key])
 
             st.divider()  # Use Streamlit's divider
 else:
