@@ -19,9 +19,9 @@ with open("vectorizer.pkl", "rb") as f:
 # ---------------------------
 # GitHub API setup
 # ---------------------------
-TOKEN = st.secrets["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"]       # Add your token in Streamlit Secrets
-REPO = st.secrets["ivanho-git/commentanalysis"]         # e.g., "username/repo"
-CSV_PATH = st.secrets["comments.csv"]        # e.g., "comments.csv"
+TOKEN = st.secrets["GITHUB_TOKEN"]       # Add your token in Streamlit Secrets
+REPO = st.secrets["GITHUB_REPO"]         # e.g., "username/repo"
+CSV_PATH = st.secrets["CSV_PATH"]        # e.g., "comments.csv"
 
 HEADERS = {
     "Authorization": f"token {TOKEN}",
