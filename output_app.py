@@ -1,31 +1,51 @@
 import streamlit as st
 import pandas as pd
+import requests
+import base64
+import json
 
-st.title("📝 Comment Output Page")
+st.title("📝 Comment Output Page (GitHub CSV)")
 
-csv_file = "comments.csv"
+# ---------------------------
+# GitHub API setup
+# ---------------------------
+TOKEN = st.secrets["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"]
+REPO = st.secrets["ivanho-git/commentanalysis"]
+CSV_PATH = st.secrets["comments.csv"]
 
-# Load comments
-try:
-    df = pd.read_csv(csv_file)
-except FileNotFoundError:
-    df = pd.DataFrame(columns=["comment", "sentiment", "score"])
+HEADERS = {
+    "Authorization": f"token {TOKEN}",
+    "Accept": "application/vnd.github.v3+json"
+}
+
+URL = f"https://api.github.com/repos/{REPO}/contents/{CSV_PATH}"
+
+def get_csv():
+    """Fetch CSV content from GitHub and return DataFrame"""
+    res = requests.get(URL, headers=HEADERS)
+    if res.status_code == 200:
+        content = res.json()
+        csv_bytes = base64.b64decode(content["content"])
+        df = pd.read_csv(pd.compat.StringIO(csv_bytes.decode()))
+        return df
+    else:
+        st.error(f"Failed to fetch CSV from GitHub: {res.status_code}")
+        return pd.DataFrame(columns=["comment", "sentiment", "score", "ProblemSummary"])
+
+# Load comments from GitHub
+df = get_csv()
 
 # Display comments in card-like layout
 if not df.empty:
     # Show latest comments first
     for idx, row in df[::-1].iterrows():
         with st.container():
-            # Optional: horizontal layout
             col1, col2 = st.columns([1, 5])
-            
-            # Column 1: User icon or placeholder
-            col1.markdown("👤")  # You can replace with actual user if available
-            
-            # Column 2: Comment content
+            col1.markdown("👤")  # Placeholder for user
             col2.markdown(f"**Comment:** {row['comment']}")
             col2.markdown(f"**Sentiment:** {row['sentiment']}  |  **Score:** {row['score']:.2f}")
-            
-            st.markdown("---")  # Separator between comments
+            if "ProblemSummary" in df.columns and row["ProblemSummary"]:
+                col2.markdown(f"**Problem Summary:** {row['ProblemSummary']}")
+            st.markdown("---")
 else:
     st.info("No comments yet.")
