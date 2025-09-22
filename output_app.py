@@ -1,5 +1,3 @@
-
-
 import streamlit as st
 import pandas as pd
 import requests
@@ -33,7 +31,7 @@ def get_csv():
         return df
     else:
         st.error(f"Failed to fetch CSV from GitHub: {res.status_code}")
-        return pd.DataFrame(columns=["comment", "sentiment", "score", "ProblemSummary"])
+        return pd.DataFrame(columns=["comment", "sentiment", "score", "ProblemSummary", "user_id"])
 
 # Add a button to refresh data
 if st.button("Refresh Data"):
@@ -60,7 +58,10 @@ if not df.empty:
             
             # Enhanced card-like display
             with col1:
-                st.markdown("👤")  # User icon
+                if "user_id" in df.columns and not pd.isna(row["user_id"]) and row["user_id"]:
+                    st.markdown(f"👤 **User ID:** {row['user_id']}")
+                else:
+                    st.markdown("👤")  # User icon
             
             with col2:
                 if not pd.isna(row['comment']) and row['comment']:  # Only show if not NaN and not empty
