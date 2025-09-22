@@ -7,7 +7,6 @@ import base64
 import json
 from datetime import datetime
 import io
-import plotly.express as px
 
 # Custom CSS for enhanced styling
 st.set_page_config(
@@ -110,27 +109,6 @@ def update_csv(df, sha):
 # Main App Layout
 st.title("💬 Comment Submission Portal")
 
-# Sidebar for Additional Information
-st.sidebar.header("📊 Submission Insights")
-
-# Fetch current data for sidebar stats
-df, _ = get_csv()
-
-# Sidebar Metrics
-st.sidebar.metric("Total Comments", len(df))
-sentiment_counts = df['sentiment'].value_counts()
-st.sidebar.metric("Positive Comments", sentiment_counts.get('positive', 0))
-st.sidebar.metric("Negative Comments", sentiment_counts.get('negative', 0))
-
-# Sentiment Distribution Chart
-st.sidebar.subheader("Sentiment Distribution")
-fig = px.pie(
-    values=sentiment_counts.values, 
-    names=sentiment_counts.index, 
-    color_discrete_sequence=['#188038', '#d93025', '#5f6368']
-)
-st.sidebar.plotly_chart(fig, use_container_width=True)
-
 # Main Input Container
 st.markdown('<div class="input-container">', unsafe_allow_html=True)
 
@@ -199,6 +177,9 @@ if submit_button and user_comment.strip() != "":
         "ProblemSummary": problem_summary
     }
 
+    # Fetch current DataFrame
+    df, sha = get_csv()
+
     # Update DataFrame
     df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
 
@@ -220,8 +201,8 @@ if submit_button and user_comment.strip() != "":
         st.info(f"Key Problem Summary: {problem_summary}")
 
     # Update GitHub CSV
-    if _:
-        update_csv(df, _)
+    if sha:
+        update_csv(df, sha)
     else:
         st.error("Could not fetch CSV SHA from GitHub.")
 
