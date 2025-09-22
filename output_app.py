@@ -9,9 +9,9 @@ st.title("📝 Comment Output Page (GitHub CSV)")
 # ---------------------------
 # GitHub API setup
 # ---------------------------
-TOKEN = st.secrets["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"]
-REPO = st.secrets["ivanho-git/commentanalysis"]
-CSV_PATH = st.secrets["comments.csv"]
+TOKEN = st.secrets["GITHUB_TOKEN"]
+REPO = st.secrets["GITHUB_REPO"]
+CSV_PATH = st.secrets["CSV_PATH"]
 
 HEADERS = {
     "Authorization": f"token {TOKEN}",
