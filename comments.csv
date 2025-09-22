@@ -1,0 +1,16 @@
+comment,sentiment,score,ProblemSummary
+this is a very sad way to show a,negative,0.8390337303328447,
+the apple is very nice i need to understand how it works though,positive,0.9337213592847532,
+"
+I love this new update! Everything works perfectly",positive,0.9907072035332825,
+"
+I love this new update! Everything works perfectly",positive,0.9907072035332825,
+"I hate the new layout, very confusing.",negative,0.4792450949080725,
+hello u are a very bad boy,neutral,0.3898053670977622,
+"streamlit is  very good pyton module
+",positive,0.99153614626818,
+"this is vey sad the ammendment will cause resentment among many indians
+",negative,0.8784697483104099,this is vey sad the ammendment will cause resentment among many indians
+"this is vey sad the ammendment will cause resentment among many indians
+",negative,0.8784697483104099,this is vey sad the ammendment will cause resentment among many indians
+heelo,neutral,0.5129347699341704,
