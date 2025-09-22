@@ -206,8 +206,4 @@ for idx, row in filtered_df.iloc[start_idx:end_idx].iterrows():
 # Pagination info
 st.write(f"Page {page_number} of {total_pages} | Showing {min(comments_per_page, len(filtered_df[start_idx:end_idx]))} of {total_comments} comments")
 
-- Using proper callback mechanisms
-- Avoiding direct session state modifications
-- Providing a clean, intuitive user interface for comment actions
 
-The code maintains all previous functionality while addressing the specific Streamlit error you encountered.
