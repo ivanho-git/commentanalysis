@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 import pickle
@@ -10,7 +11,7 @@ import io
 
 # Page Configuration
 st.set_page_config(
-    page_title="Sentilytics | Share Your Voice",
+    page_title="Comment Submission",
     page_icon="💬",
     layout="wide"
 )
@@ -79,14 +80,6 @@ st.markdown("""
         border-radius: 8px;
         margin-top: 20px;
     }
-
-    /* Company Branding */
-    .company-tagline {
-        text-align: center;
-        color: #666;
-        font-style: italic;
-        margin-bottom: 20px;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -137,13 +130,6 @@ def update_csv(df, sha):
 # Main App Layout
 st.markdown('<div class="main-container">', unsafe_allow_html=True)
 
-# Company Tagline
-st.markdown("""
-    <div class="company-tagline">
-        Sentilytics: Made for the People, by the People
-    </div>
-""", unsafe_allow_html=True)
-
 # Title with Modern Typography
 st.markdown("""
     <h1 style="
@@ -155,7 +141,7 @@ st.markdown("""
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
     ">
-    💬 Share Your Voice
+    💬 Share Your Thoughts
     </h1>
 """, unsafe_allow_html=True)
 
@@ -166,7 +152,7 @@ with col1:
     user_id = st.text_input(
         "User ID", 
         placeholder="Enter your username",
-        help="This helps us track your comments and ensure community accountability"
+        help="This helps us track your comments"
     )
 
 with col2:
@@ -176,7 +162,7 @@ with col2:
 # Comment Input
 user_comment = st.text_area(
     "Your Comment", 
-    placeholder="What insights can you share with the community?",
+    placeholder="What's on your mind?",
     height=200
 )
 
@@ -229,8 +215,8 @@ if submit_button and user_comment.strip() != "":
         if success:
             st.markdown("""
             <div class="success-message">
-                <h3>✅ Voice Captured Successfully!</h3>
-                <p>Thank you for contributing to Sentilytics. Your insight matters.</p>
+                <h3>✅ Comment Uploaded Successfully!</h3>
+                <p>Thank you for sharing your thoughts.</p>
             </div>
             """, unsafe_allow_html=True)
         else:
@@ -238,7 +224,7 @@ if submit_button and user_comment.strip() != "":
     else:
         st.error("Could not fetch CSV SHA from GitHub.")
 
-# Footer with Sentilytics Branding
+# Footer with Modern Design
 st.markdown("""
 <div style="
     text-align: center; 
@@ -248,6 +234,6 @@ st.markdown("""
     background-color: rgba(255,255,255,0.7);
     border-radius: 10px;
 ">
-    <strong>Sentilytics</strong> | Empowering Voices, Driving Change | © 2024
+    Powered by AI-Driven Insights | © 2024 Feedback Platform
 </div>
-""", unsafe_allow_html=True)
+
