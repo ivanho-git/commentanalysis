@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import pickle
@@ -9,76 +8,53 @@ import json
 from datetime import datetime
 import io
 
-# Page Configuration
+# Custom CSS for enhanced styling
 st.set_page_config(
     page_title="Comment Submission",
     page_icon="💬",
     layout="wide"
 )
 
-# Advanced Custom CSS
+# Custom Styling
 st.markdown("""
 <style>
     /* Global Styling */
     .stApp {
-        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        font-family: 'Roboto', 'Inter', sans-serif;
+        background-color: #f0f4f8;
+        font-family: 'Inter', sans-serif;
     }
-
-    /* Main Container */
-    .main-container {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-        padding: 30px;
-        max-width: 800px;
-        margin: 0 auto;
-        transition: all 0.3s ease;
+    
+    /* Input Container */
+    .input-container {
+        background-color: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 20px;
+        margin-bottom: 20px;
     }
-
-    .main-container:hover {
-        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
-        transform: translateY(-5px);
-    }
-
-    /* Input Styling */
-    .stTextInput > div > div > input, 
-    .stTextArea > div > div > textarea {
-        border-radius: 10px;
-        border: 1.5px solid #e0e0e0;
-        padding: 12px;
-        transition: all 0.3s ease;
-    }
-
-    .stTextInput > div > div > input:focus, 
-    .stTextArea > div > div > textarea:focus {
-        border-color: #4a90e2;
-        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-    }
-
-    /* Submit Button */
-    .stButton > button {
-        background-color: #4a90e2;
-        color: white;
-        border-radius: 10px;
+    
+    /* Sentiment Chips */
+    .sentiment-chip {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 20px;
         font-weight: bold;
-        transition: all 0.3s ease;
-        text-transform: uppercase;
-        padding: 12px 24px;
+        margin-right: 10px;
     }
-
-    .stButton > button:hover {
-        background-color: #357abd;
-        transform: scale(1.05);
-    }
-
-    /* Success Message */
-    .success-message {
+    
+    .positive-chip {
         background-color: #e6f3ea;
-        border-left: 5px solid #2ecc71;
-        padding: 15px;
-        border-radius: 8px;
-        margin-top: 20px;
+        color: #188038;
+    }
+    
+    .negative-chip {
+        background-color: #fce8e6;
+        color: #d93025;
+    }
+    
+    .neutral-chip {
+        background-color: #f1f3f4;
+        color: #5f6368;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -125,44 +101,35 @@ def update_csv(df, sha):
         "sha": sha
     }
     res = requests.put(URL, headers=HEADERS, data=json.dumps(data))
-    return res.status_code in [200, 201]
+    if res.status_code in [200, 201]:
+        st.success("Comment submitted ✅ Sentiment updated in GitHub CSV")
+    else:
+        st.error(f"Failed to update CSV: {res.text}")
 
 # Main App Layout
-st.markdown('<div class="main-container">', unsafe_allow_html=True)
+st.title("💬 Comment Submission Portal")
 
-# Title with Modern Typography
-st.markdown("""
-    <h1 style="
-        text-align: center; 
-        color: #333; 
-        font-weight: 700; 
-        margin-bottom: 30px;
-        background: linear-gradient(to right, #4a90e2, #50c878);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    ">
-    💬 Share Your Thoughts
-    </h1>
-""", unsafe_allow_html=True)
+# Main Input Container
+st.markdown('<div class="input-container">', unsafe_allow_html=True)
 
 # User Input Columns
-col1, col2 = st.columns([3, 1])
+col1, col2 = st.columns([2, 1])
 
 with col1:
     user_id = st.text_input(
-        "User ID", 
-        placeholder="Enter your username",
-        help="This helps us track your comments"
+        "Enter your User ID", 
+        placeholder="username or email",
+        help="This helps us track and categorize comments"
     )
 
 with col2:
-    # Placeholder for future profile features
+    # Optional: Add a profile picture upload or avatar selection
     st.write("👤 Profile")
 
 # Comment Input
 user_comment = st.text_area(
-    "Your Comment", 
-    placeholder="What's on your mind?",
+    "Share your thoughts", 
+    placeholder="Type your comment here...",
     height=200
 )
 
@@ -170,7 +137,7 @@ user_comment = st.text_area(
 submit_col1, submit_col2 = st.columns([3, 1])
 
 with submit_col2:
-    submit_button = st.button("Submit", use_container_width=True)
+    submit_button = st.button("Submit Comment", use_container_width=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
@@ -192,13 +159,22 @@ if submit_button and user_comment.strip() != "":
     sentiment = model.predict(vec)[0]
     score = max(model.predict_proba(vec)[0])
 
+    # Problem Summary
+    def summarize_problem(text, sentiment_label, max_words=12):
+        if sentiment_label.lower() == "negative":
+            words = text.split()
+            return " ".join(words[:max_words]) + ("..." if len(words) > max_words else "")
+        return ""
+
+    problem_summary = summarize_problem(user_comment, sentiment)
+
     # Prepare New Row
     new_row = {
         "user_id": user_id or "Anonymous",
         "comment": user_comment,
         "sentiment": sentiment,
         "score": score,
-        "ProblemSummary": ""
+        "ProblemSummary": problem_summary
     }
 
     # Fetch current DataFrame
@@ -207,33 +183,29 @@ if submit_button and user_comment.strip() != "":
     # Update DataFrame
     df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
 
+    # Sentiment Visualization
+    sentiment_color = (
+        "green" if sentiment.lower() == 'positive' 
+        else "red" if sentiment.lower() == 'negative' 
+        else "gray"
+    )
+
+    # Result Display
+    st.markdown(f"""
+    <div class="sentiment-chip {sentiment_color}-chip">
+        Sentiment: {sentiment} (Confidence: {score:.2f})
+    </div>
+    """, unsafe_allow_html=True)
+
+    if problem_summary:
+        st.info(f"Key Problem Summary: {problem_summary}")
+
     # Update GitHub CSV
     if sha:
-        success = update_csv(df, sha)
-        
-        # Success Message with Modern Styling
-        if success:
-            st.markdown("""
-            <div class="success-message">
-                <h3>✅ Comment Uploaded Successfully!</h3>
-                <p>Thank you for sharing your thoughts.</p>
-            </div>
-            """, unsafe_allow_html=True)
-        else:
-            st.error("Failed to upload comment. Please try again.")
+        update_csv(df, sha)
     else:
         st.error("Could not fetch CSV SHA from GitHub.")
 
-# Footer with Modern Design
-st.markdown("""
-<div style="
-    text-align: center; 
-    color: #666; 
-    margin-top: 30px;
-    padding: 15px;
-    background-color: rgba(255,255,255,0.7);
-    border-radius: 10px;
-">
-    Powered by AI-Driven Insights | © 2024 Feedback Platform
-</div>
-
+# Footer
+st.markdown("---")
+st.markdown("<div style='text-align: center; color: gray;'>Powered by AI-Driven Sentiment Analysis</div>", unsafe_allow_html=True)
