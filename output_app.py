@@ -3,6 +3,7 @@ import pandas as pd
 import requests
 import base64
 import json
+import io  # Add this import
 
 st.title("📝 Comment Output Page (GitHub CSV)")
 
@@ -26,7 +27,7 @@ def get_csv():
     if res.status_code == 200:
         content = res.json()
         csv_bytes = base64.b64decode(content["content"])
-        df = pd.read_csv(pd.compat.StringIO(csv_bytes.decode()))
+        df = pd.read_csv(io.StringIO(csv_bytes.decode()))  # Change this line
         return df
     else:
         st.error(f"Failed to fetch CSV from GitHub: {res.status_code}")
