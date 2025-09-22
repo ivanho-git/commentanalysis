@@ -1,25 +1,26 @@
 comment,sentiment,score,ProblemSummary,user_id
-this is a very sad way to show a,negative,0.8390337303328447,
-the apple is very nice i need to understand how it works though,positive,0.9337213592847532,
+this is a very sad way to show a,negative,0.8390337303328447,,
+the apple is very nice i need to understand how it works though,positive,0.9337213592847532,,
 "
-I love this new update! Everything works perfectly",positive,0.9907072035332825,
+I love this new update! Everything works perfectly",positive,0.9907072035332825,,
 "
-I love this new update! Everything works perfectly",positive,0.9907072035332825,
-"I hate the new layout, very confusing.",negative,0.4792450949080725,
-hello u are a very bad boy,neutral,0.3898053670977622,
+I love this new update! Everything works perfectly",positive,0.9907072035332825,,
+"I hate the new layout, very confusing.",negative,0.4792450949080725,,
+hello u are a very bad boy,neutral,0.3898053670977622,,
 "streamlit is  very good pyton module
-",positive,0.99153614626818,
+",positive,0.99153614626818,,
 "this is vey sad the ammendment will cause resentment among many indians
-",negative,0.8784697483104099,this is vey sad the ammendment will cause resentment among many indians
+",negative,0.8784697483104099,this is vey sad the ammendment will cause resentment among many indians,
 "this is vey sad the ammendment will cause resentment among many indians
-",negative,0.8784697483104099,this is vey sad the ammendment will cause resentment among many indians
-heelo,neutral,0.5129347699341704,
-hey,positive,0.526275661826766,
-the world is a beautiful place to live in,positive,0.8890733275648145,
-gucci is a very good boy,positive,0.9134967134457088,
-this is a nice product but the casing is bad,positive,0.7121728319613194,
-extremely horrible greatly marginalize the indians,positive,0.5536983977863182,
-extremely horrible greatly marginalize the indians,positive,0.5536983977863182,
-extremely horrible greatly marginalize the indians,positive,0.5536983977863182,
-this is th ened,neutral,0.5129347699341704,
-world is nice,positive,0.9687732269092825,
+",negative,0.8784697483104099,this is vey sad the ammendment will cause resentment among many indians,
+heelo,neutral,0.5129347699341704,,
+hey,positive,0.526275661826766,,
+the world is a beautiful place to live in,positive,0.8890733275648145,,
+gucci is a very good boy,positive,0.9134967134457088,,
+this is a nice product but the casing is bad,positive,0.7121728319613194,,
+extremely horrible greatly marginalize the indians,positive,0.5536983977863182,,
+extremely horrible greatly marginalize the indians,positive,0.5536983977863182,,
+extremely horrible greatly marginalize the indians,positive,0.5536983977863182,,
+this is th ened,neutral,0.5129347699341704,,
+world is nice,positive,0.9687732269092824,,
+hellow orld,neutral,0.5129347699341704,,user234
