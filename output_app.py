@@ -96,13 +96,17 @@ if not df.empty:
                 considered_key = f"considered_{idx}"
                 disapproved_key = f"disapproved_{idx}"
 
-                if considered_key not in st.session_state:
-                    st.session_state[considered_key] = False
-                if disapproved_key not in st.session_state:
-                    st.session_state[disapproved_key] = False
+                col3, col4 = st.columns([1, 1])  # Create two columns for the buttons
 
-                considered_button = st.button("✅ Considered", key=considered_key, on_click=lambda: st.session_state.update({considered_key: True}), disabled=st.session_state[disapproved_key])
-                disapproved_button = st.button("❌ Disapproved", key=disapproved_key, on_click=lambda: st.session_state.update({disapproved_key: True}), disabled=st.session_state[considered_key])
+                with col3:
+                    if considered_key not in st.session_state:
+                        st.session_state[considered_key] = False
+                    considered_button = st.button("✅ Considered", key=considered_key, on_click=lambda: st.session_state.update({considered_key: True, disapproved_key: False}), disabled=st.session_state.get(disapproved_key, False))
+
+                with col4:
+                    if disapproved_key not in st.session_state:
+                        st.session_state[disapproved_key] = False
+                    disapproved_button = st.button("❌ Disapproved", key=disapproved_key, on_click=lambda: st.session_state.update({disapproved_key: True, considered_key: False}), disabled=st.session_state.get(considered_key, False))
 
             st.divider()  # Use Streamlit's divider
 else:
