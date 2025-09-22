@@ -8,6 +8,84 @@ import json
 from datetime import datetime
 import io  # Add this import
 
+# Define colors for a YouTube-like UI
+bg_color = "#141414"
+text_color = "#FFFFFF"
+comment_bg = "#1E1E1E"
+author_color = "#AAAAAA"
+timestamp_color = "#777777"
+considered_color = "#4CAF50"  # Green
+disapproved_color = "#F44336"  # Red
+input_bg = "#333333"
+button_color = "#2196F3"  # Blue
+
+# Apply global styling
+st.markdown(f"""
+<style>
+body {{
+    background-color: {bg_color};
+    color: {text_color};
+}}
+h1, h2 {{
+    color: {text_color};
+}}
+.stTextInput > div > div > input {{
+    background-color: {input_bg};
+    color: {text_color};
+    border: 1px solid {dark_gray};
+}}
+.stTextArea > div > div > textarea {{
+    background-color: {input_bg};
+    color: {text_color};
+    border: 1px solid {dark_gray};
+}}
+.stButton > button {{
+    background-color: {button_color};
+    color: {text_color};
+    border: none;
+    border-radius: 5px;
+}}
+.stExpander {{
+    border: none;
+    background-color: {comment_bg};
+    padding: 10px;
+    margin-bottom: 5px;
+    border-radius: 5px;
+}}
+.comment-container {{
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}}
+.author-info {{
+    margin-right: 10px;
+    font-size: 0.8em;
+    color: {author_color};
+}}
+.author-name {{
+    font-weight: bold;
+}}
+.timestamp {{
+    color: {timestamp_color};
+}}
+.comment-text {{
+    flex-grow: 1;
+}}
+.like-button {{
+    background-color: transparent;
+    border: none;
+    color: {like_color};
+    font-size: 1em;
+    cursor: pointer;
+    padding: 0;
+}}
+</style>
+""", unsafe_allow_html=True)
+
+dark_gray = "#333333"
+
+st.title("💬 Comment Input Page (GitHub CSV)")
+
 # ---------------------------
 # Load trained model + vectorizer
 # ---------------------------
@@ -62,7 +140,6 @@ def update_csv(df, sha):
 # ---------------------------
 # Streamlit page
 # ---------------------------
-st.title("💬 Comment Input Page (GitHub CSV)")
 
 df, sha = get_csv()
 
@@ -70,7 +147,6 @@ df, sha = get_csv()
 # User input
 # ---------------------------
 user_id = st.text_input("Enter your User ID (e.g., username):", value="Unknown")  # Default to "Unknown"
-
 user_comment = st.text_area("Enter your comment:")
 
 if st.button("Submit") and user_comment.strip() != "":
