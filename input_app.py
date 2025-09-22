@@ -37,10 +37,12 @@ def get_csv():
     if res.status_code == 200:
         content = res.json()
         csv_bytes = base64.b64decode(content["content"])
-        df = pd.read_csv(io.StringIO(csv_bytes.decode()))  # Change this line
+        df = pd.read_csv(io.StringIO(csv_bytes.decode()))  # As previously fixed
+        if "user_id" not in df.columns:  # Add user_id column if it doesn't exist
+            df["user_id"] = "Unknown"  # Default value for existing rows
         return df, content["sha"]
     else:
-        return pd.DataFrame(columns=["comment", "sentiment", "score", "ProblemSummary"]), None
+        return pd.DataFrame(columns=["comment", "sentiment", "score", "ProblemSummary", "user_id"]), None  # Include user_id in empty DataFrame
 
 def update_csv(df, sha):
     """Push updated CSV back to GitHub"""
@@ -67,6 +69,8 @@ df, sha = get_csv()
 # ---------------------------
 # User input
 # ---------------------------
+user_id = st.text_input("Enter your User ID (e.g., username):", value="Unknown")  # Default to "Unknown"
+
 user_comment = st.text_area("Enter your comment:")
 
 if st.button("Submit") and user_comment.strip() != "":
@@ -107,6 +111,7 @@ if st.button("Submit") and user_comment.strip() != "":
     # Save to GitHub CSV
     # ---------------------------
     new_row = {
+        "user_id": user_id,  # Add user_id to the new row
         "comment": user_comment,
         "sentiment": sentiment,
         "score": score,
