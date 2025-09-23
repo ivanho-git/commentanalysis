@@ -53,18 +53,19 @@ def update_csv(df, sha):
     }
     res = requests.put(URL, headers=HEADERS, data=json.dumps(data))
     if res.status_code in [200, 201]:
-        st.success("✅ Comment submitted & Sentiment updated in GitHub CSV 🎉🔥")
+        st.success("✅ Comment submitted & analyzed by Sentilytics 🚀")
+        st.balloons()
     else:
         st.error(f"🚨 Failed to update CSV: {res.text}")
 
 # ---------------------------
-# Custom CSS for Crazy Colorful UI
+# Custom CSS for Sentilytics Branding
 # ---------------------------
 st.markdown(
     """
     <style>
     body {
-        background: linear-gradient(120deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1, #fbc2eb, #fad0c4);
+        background: linear-gradient(120deg, #1a2a6c, #b21f1f, #fdbb2d);
         background-size: 400% 400%;
         animation: gradientBG 12s ease infinite;
         color: white;
@@ -74,20 +75,42 @@ st.markdown(
         50% {background-position: 100% 50%;}
         100% {background-position: 0% 50%;}
     }
+    .company-title {
+        font-size: 42px;
+        font-weight: bold;
+        color: #FFD700;
+        text-align: center;
+        margin-bottom: 5px;
+        text-shadow: 2px 2px 8px #000000;
+    }
+    .company-subtitle {
+        font-size: 20px;
+        font-weight: 500;
+        color: #ffffff;
+        text-align: center;
+        margin-bottom: 5px;
+    }
+    .company-tagline {
+        font-size: 18px;
+        font-style: italic;
+        color: #00FA9A;
+        text-align: center;
+        margin-bottom: 30px;
+    }
     .stTextInput>div>div>input {
-        border: 3px solid #FF5733;
+        border: 3px solid #FFD700;
         border-radius: 10px;
         padding: 10px;
         font-size: 16px;
     }
     .stTextArea textarea {
-        border: 3px solid #33FF57;
+        border: 3px solid #00FA9A;
         border-radius: 10px;
-        background-color: #fff0f6;
+        background-color: #fffdf5;
         font-size: 16px;
     }
     .stButton>button {
-        background: linear-gradient(90deg, #ff6a00, #ee0979);
+        background: linear-gradient(90deg, #ff512f, #dd2476);
         color: white;
         border-radius: 12px;
         padding: 10px 24px;
@@ -98,14 +121,7 @@ st.markdown(
     }
     .stButton>button:hover {
         transform: scale(1.1);
-        background: linear-gradient(90deg, #00c6ff, #0072ff);
-    }
-    .big-title {
-        font-size: 36px;
-        font-weight: bold;
-        color: #fff;
-        text-align: center;
-        text-shadow: 2px 2px 4px #000000;
+        background: linear-gradient(90deg, #36d1dc, #5b86e5);
     }
     .result-box {
         padding: 20px;
@@ -116,28 +132,39 @@ st.markdown(
         margin: 15px 0;
         color: black;
     }
-    .positive {background: #a1ffce; background: linear-gradient(45deg,#a1ffce,#faffd1);}
-    .negative {background: #ffafbd; background: linear-gradient(45deg,#ffafbd,#ffc3a0);}
-    .neutral {background: #89f7fe; background: linear-gradient(45deg,#89f7fe,#66a6ff);}
+    .positive {background: linear-gradient(45deg,#a8ff78,#78ffd6);}
+    .negative {background: linear-gradient(45deg,#ff6a88,#ff99ac);}
+    .neutral {background: linear-gradient(45deg,#89f7fe,#66a6ff);}
+    .footer {
+        font-size: 14px;
+        text-align: center;
+        margin-top: 50px;
+        padding: 15px;
+        color: #f0f0f0;
+        background: rgba(0,0,0,0.3);
+        border-radius: 12px;
+    }
     </style>
     """,
     unsafe_allow_html=True
 )
 
 # ---------------------------
-# Streamlit page
+# Branding Header
 # ---------------------------
-st.markdown('<div class="big-title">💬 CRAZY COMMENT INPUT PAGE 🚀</div>', unsafe_allow_html=True)
+st.markdown('<div class="company-title">💡 Sentilytics 💡</div>', unsafe_allow_html=True)
+st.markdown('<div class="company-subtitle">⚡ Turning Comments into Smart Insights ⚡</div>', unsafe_allow_html=True)
+st.markdown('<div class="company-tagline">"Made by the People, for the People" 🌍</div>', unsafe_allow_html=True)
 
 df, sha = get_csv()
 
 # ---------------------------
 # User input
 # ---------------------------
-user_id = st.text_input("🧑 Enter your User ID:", value="Unknown")
-user_comment = st.text_area("✍️ Enter your Comment:")
+user_id = st.text_input("👤 Enter your User ID:", value="Unknown")
+user_comment = st.text_area("💬 Enter your Comment:")
 
-if st.button("🎯 Submit Comment"):
+if st.button("🚀 Submit Comment"):
     if user_comment.strip() != "":
         def clean_text(text):
             text = str(text).lower()
@@ -175,10 +202,9 @@ if st.button("🎯 Submit Comment"):
         else:
             st.error("❌ Could not fetch CSV SHA from GitHub.")
 
-        # Fancy result box
         sentiment_class = "positive" if sentiment.lower() == "positive" else ("negative" if sentiment.lower() == "negative" else "neutral")
         st.markdown(
-            f'<div class="result-box {sentiment_class}">🎉 Sentiment: <b>{sentiment}</b> (Score: {score:.2f})</div>',
+            f'<div class="result-box {sentiment_class}">📊 Sentilytics Analysis → <b>{sentiment}</b> (Score: {score:.2f})</div>',
             unsafe_allow_html=True
         )
         if problem_summary:
@@ -186,3 +212,16 @@ if st.button("🎯 Submit Comment"):
                 f'<div class="result-box negative">⚠️ Problem Summary: {problem_summary}</div>',
                 unsafe_allow_html=True
             )
+
+# ---------------------------
+# Footer
+# ---------------------------
+st.markdown(
+    """
+    <div class="footer">
+        © 2025 Sentilytics · "Made by the People, for the People" 🌍 <br>
+        Made with ❤️ by <b>Team CodeBlooded</b>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
