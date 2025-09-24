@@ -209,6 +209,7 @@ if st.button("🚀 Submit") and user_comment.strip() != "":
 # Footer Branding
 # ---------------------------
 st.markdown(
-    """<footer>💖 Made with love by <b>Team CodeBlooded</b></footer>""",
+    """<footer> 
+    @2025💖 Made with love by <b>Team CodeBlooded</b></footer>""",
     unsafe_allow_html=True
 )
